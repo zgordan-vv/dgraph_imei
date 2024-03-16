@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	// "time"
 
 	"github.com/dgraph-io/dgo/v230"
 	"github.com/dgraph-io/dgo/v230/protos/api"
@@ -52,7 +51,6 @@ func upsertDevice(ctx context.Context, client *dgo.Dgraph, call *Call) error {
 	txn := client.NewTxn()
 	defer txn.Discard(ctx)
 
-	// Upsert for device entities (IMEI_FROM and IMEI_TO)
 	upsertQuery := fmt.Sprintf(`
 		query {
 			q(func: eq(IMEI, "%s")) {
@@ -136,7 +134,6 @@ func upsertAccount(ctx context.Context, client *dgo.Dgraph, call *Call) error {
 		return err
 	}
 
-	// Upsert for account entities (MSDIN)
 	upsertQuery := fmt.Sprintf(`query {
 		var(func: eq(MSDIN, "%s")) {
 			account as uid

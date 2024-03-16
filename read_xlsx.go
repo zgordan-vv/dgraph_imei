@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	// "time"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -61,7 +60,7 @@ func readXLSXFile(filePath string) ([]*Call, error) {
 			log.Printf("Invalid IMEI_TO: %s, %s", row[5], err.Error())
 			continue
 		}
-		call.CallTime = row[6]
+		call.CallTime = row[6] // call_time
 
 		data = append(data, call)
 	}
