@@ -43,6 +43,20 @@ func alterSchema(client *dgo.Dgraph, schema string) error {
 	return nil
 }
 
+func upsertAll(client *dgo.Dgraph, call *Call) error {
+	ctx := context.Background()
+	if err := upsertDevice(ctx, client, call); err != nil {
+		return err
+	}
+	if err := upsertAccount(ctx, client, call); err != nil {
+		return err
+	}
+	if err := insertCall(ctx, client, call); err != nil {
+		return err
+	}
+	return nil
+}
+
 func upsertDevice(ctx context.Context, client *dgo.Dgraph, call *Call) error {
 	if err := alterSchema(client, deviceSchema); err != nil {
 		return err
@@ -194,20 +208,6 @@ func insertCall(ctx context.Context, client *dgo.Dgraph, call *Call) error {
 	}
 	if _, err := txn.Mutate(ctx, mutation); err != nil {
 		log.Printf("Failed to insert call: %v", err)
-		return err
-	}
-	return nil
-}
-
-func upsertAll(client *dgo.Dgraph, call *Call) error {
-	ctx := context.Background()
-	if err := upsertDevice(ctx, client, call); err != nil {
-		return err
-	}
-	if err := upsertAccount(ctx, client, call); err != nil {
-		return err
-	}
-	if err := insertCall(ctx, client, call); err != nil {
 		return err
 	}
 	return nil

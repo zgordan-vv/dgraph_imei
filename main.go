@@ -1,15 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"os"
 
 	"github.com/dgraph-io/dgo/v230"
 	"github.com/dgraph-io/dgo/v230/protos/api"
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 )
-
-const grpcAddr = "localhost:9080"
 
 type Call struct {
 	Msdin	   string  `json:"MSDIN"`
@@ -23,27 +22,42 @@ type Call struct {
 }
 
 func main() {
-	data, err := readXLSXFile("./test_file.xlsx")
+	if err := godotenv.Load(".env"); err != nil{
+		log.Fatalf("Error loading .env file: %s", err)
+	}
+	args := os.Args
+	if len(args) < 2 {
+		log.Fatal("No filename in command line arguments")
+	}
+	filename := args[1]
+	if err := parseXLSXFile(filename); err != nil {
+		log.Fatalf("Failed to parse xlsx file: %v", err)
+	}
+}
+
+func parseXLSXFile(filename string) error {
+	data, err := readXLSXFile(filename)
 	if err != nil {
-		log.Fatalf("Error reading .xlsx file %v", err)
+		return err
 	}
 
 	client := newDgraphClient()
 
 	for _, call := range data {
-		fmt.Println("\n\n\nUPSERTING:", call)
 		err = upsertAll(client, call)
 		if err != nil {
-			log.Fatalf("Failed to upsert data: %v", err)
+			return err
 		}
 	}
+	return nil
 }
 
 func newDgraphClient() *dgo.Dgraph {
+	grpcAddr := os.Getenv("GRPC_ADDR")
 	dialOpts := []grpc.DialOption{grpc.WithInsecure()}
 	conn, err := grpc.Dial(grpcAddr, dialOpts...)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Cannot dial Dgraph client: %v", err)
 	}
 
 	return dgo.NewDgraphClient(
