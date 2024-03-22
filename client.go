@@ -1,4 +1,4 @@
-package main
+package dgraph_imei
 
 import (
 	"log"
@@ -21,7 +21,8 @@ type Call struct {
 	DgraphType string  `json:"dgraph.type"`
 }
 
-func parseXLSXFile(filename string) error {
+// ReadXLSXFile reads an xlsx file with a given name or path from GRPC server
+func ReadXLSXFile(filename string) error {
 	data, err := readXLSXFile(filename)
 	if err != nil {
 		return err

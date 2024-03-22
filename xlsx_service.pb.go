@@ -4,7 +4,7 @@
 // 	protoc        v3.21.12
 // source: xlsx_service.proto
 
-package main
+package dgraph_imei
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
