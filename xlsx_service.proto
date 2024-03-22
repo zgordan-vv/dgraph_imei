@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package xlsxservice;
+option go_package="github.com/src/zgordan-vv/dgraph_imei/pb";
+
+// The gRPC service definition for streaming XLSX data.
+service XlsxService {
+  // Requests the XLSX data for a given file path and receives it in chunks.
+  rpc GetXlsxData(GetXlsxRequest) returns (stream XlsxDataChunk);
+}
+
+// Request message for requesting XLSX data.
+// Contains the file path of the XLSX file to be streamed.
+message GetXlsxRequest {
+  string filePath = 1; // The path to the XLSX file on the server.
+}
+
+// Data chunk of the XLSX file.
+// Each message contains a part of the file's data.
+message XlsxDataChunk {
+  bytes chunk = 1; // A chunk of the XLSX file data.
+}

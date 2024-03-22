@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/xuri/excelize/v2"
+	_ "github.com/zgordan-vv/dgraph_imei/pb"
 )
 
 func readXLSXFile(filePath string) ([]*Call, error) {
