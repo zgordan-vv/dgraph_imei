@@ -13,8 +13,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-func readXLSXFile(filePath string) ([]*Call, error) {
-	conn, err := grpc.Dial(":50051", grpc.WithInsecure())
+func readXLSXFile(filePath, grpcAddr string) ([]*Call, error) {
+	conn, err := grpc.Dial(grpcAddr, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}

@@ -7,7 +7,8 @@ import (
 
 func TestClient(t *testing.T) {
 	go runTestServer() // running test server
-	if err := ReadXLSXFile("test_file.xlsx"); err != nil {
+	cli := NewClient("localhost:9080", ":50051")
+	if err := cli.ReadXLSXFile("test_file.xlsx"); err != nil {
 		log.Fatalf("Failed to parse xlsx file: %v", err)
 	}
 }

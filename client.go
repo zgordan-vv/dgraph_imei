@@ -2,13 +2,16 @@ package dgraph_imei
 
 import (
 	"log"
-	"os"
 
 	"github.com/dgraph-io/dgo/v230"
 	"github.com/dgraph-io/dgo/v230/protos/api"
-	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 )
+
+type FileClient struct {
+	dgraphClient   *dgo.Dgraph
+	grpcServerAddr string
+}
 
 type Call struct {
 	Msdin	   string  `json:"MSDIN"`
@@ -21,17 +24,24 @@ type Call struct {
 	DgraphType string  `json:"dgraph.type"`
 }
 
+func NewClient(dgraphGRPCAddr, grpcServerAddr string) *FileClient {
+	dc := newDgraphClient(dgraphGRPCAddr)
+	client := &FileClient{
+		dgraphClient: dc,
+		grpcServerAddr: grpcServerAddr,
+	}
+	return client
+}
+
 // ReadXLSXFile reads an xlsx file with a given name or path from GRPC server
-func ReadXLSXFile(filename string) error {
-	data, err := readXLSXFile(filename)
+func (c *FileClient) ReadXLSXFile(filename string) error {
+	data, err := readXLSXFile(filename, c.grpcServerAddr)
 	if err != nil {
 		return err
 	}
 
-	client := newDgraphClient()
-
 	for _, call := range data {
-		err = upsertAll(client, call)
+		err = upsertAll(c.dgraphClient, call)
 		if err != nil {
 			return err
 		}
@@ -39,13 +49,9 @@ func ReadXLSXFile(filename string) error {
 	return nil
 }
 
-func newDgraphClient() *dgo.Dgraph {
-	if err := godotenv.Load(".env"); err != nil{
-		log.Fatalf("Error loading .env file: %s", err)
-	}
-	grpcAddr := os.Getenv("GRPC_ADDR")
+func newDgraphClient(dgraphGRPCAddr string) *dgo.Dgraph {
 	dialOpts := []grpc.DialOption{grpc.WithInsecure()}
-	conn, err := grpc.Dial(grpcAddr, dialOpts...)
+	conn, err := grpc.Dial(dgraphGRPCAddr, dialOpts...)
 	if err != nil {
 		log.Fatalf("Cannot dial Dgraph client: %v", err)
 	}
