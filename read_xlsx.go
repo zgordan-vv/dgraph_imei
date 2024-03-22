@@ -1,19 +1,50 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"strconv"
 
 	"github.com/xuri/excelize/v2"
-	_ "github.com/zgordan-vv/dgraph_imei/pb"
+	"google.golang.org/grpc"
 )
 
 func readXLSXFile(filePath string) ([]*Call, error) {
-	f, err := excelize.OpenFile(filePath)
+	conn, err := grpc.Dial(":50051", grpc.WithInsecure())
 	if err != nil {
-		return nil, err
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	client := NewXlsxServiceClient(conn)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	stream, err := client.GetXlsxData(ctx, &GetXlsxRequest{FilePath: filePath})
+	if err != nil {
+		log.Fatalf("could not fetch XLSX data: %v", err)
+	}
+
+	var xlsxData []byte
+
+	for {
+		chunk, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalf("failed to receive a chunk : %v", err)
+		}
+
+		xlsxData = append(xlsxData, chunk.Chunk...)
+	}
+
+	f, err := excelize.OpenReader(io.NopCloser(bytes.NewReader(xlsxData)))
+	if err != nil {
+		log.Fatalf("failed to open XLSX data: %v", err)
 	}
 	defer f.Close()
 

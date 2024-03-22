@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: xlsx_service.proto
 
-package pb
+package main
 
 import (
 	context "context"
