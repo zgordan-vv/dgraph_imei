@@ -1,4 +1,4 @@
-module zgordan-vv/dgraph_imei
+module github.com/zgordan-vv/dgraph_imei
 
 go 1.22.1
 
