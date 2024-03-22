@@ -8,7 +8,7 @@ To use the project from outside:
 
 ```
 import (
-    imei as "github.com/zgordan-vv/dgraph_imei"
+    imei "github.com/zgordan-vv/dgraph_imei"
 )
 ```
 
