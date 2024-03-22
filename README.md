@@ -10,6 +10,7 @@ package main
 
 import (
     imei "github.com/zgordan-vv/dgraph_imei"
+    "log"
 )
 
 func main() {
